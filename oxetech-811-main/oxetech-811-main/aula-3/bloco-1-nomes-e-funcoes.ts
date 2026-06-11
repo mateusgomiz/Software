@@ -8,30 +8,68 @@
 //   4) Remova o flag argument `log` (separe cálculo de efeito colateral).
 // =============================================================================
 
-type P = { n: string; v: number; q: number };
+type CartItem = {
+	name: string;
+	unitPriceInCents: number;
+	quantity: number;
+};
 
-// Calcula o total de um carrinho aplicando desconto por tipo de cliente
-// e, opcionalmente, imprime o recibo. Mistura cálculo com efeito colateral.
-export function calc(itens: P[], t: number, log: boolean): number {
-	let s = 0;
-	for (let i = 0; i < itens.length; i++) {
-		s = s + itens[i].v * itens[i].q;
-	}
-	let d = 0;
-	if (t === 1) d = s * 0.05;
-	if (t === 2) d = s * 0.1;
-	const tot = s - d;
-	if (log === true) {
-		console.log("Subtotal: R$ " + (s / 100).toFixed(2));
-		console.log("Desconto: R$ " + (d / 100).toFixed(2));
-		console.log("Total:    R$ " + (tot / 100).toFixed(2));
-	}
-	return tot;
+enum CustomerType {
+	Regular = 0,
+	Silver = 1,
+	Gold = 2,
 }
 
-const carrinho: P[] = [
-	{ n: "Camiseta", v: 7990, q: 2 },
-	{ n: "Tênis", v: 24990, q: 1 },
+const SILVER_DISCOUNT_RATE = 0.05;
+const GOLD_DISCOUNT_RATE = 0.1;
+
+function calculateItemTotal(item: CartItem): number {
+	return item.unitPriceInCents * item.quantity;
+}
+
+function calculateSubtotal(items: CartItem[]): number {
+	return items.reduce((subtotal, item) => subtotal + calculateItemTotal(item), 0);
+}
+
+function getDiscountRate(customerType: CustomerType): number {
+	if (customerType === CustomerType.Silver) {
+		return SILVER_DISCOUNT_RATE;
+	}
+
+	if (customerType === CustomerType.Gold) {
+		return GOLD_DISCOUNT_RATE;
+	}
+
+	return 0;
+}
+
+export function calculateCartTotal(items: CartItem[], customerType: CustomerType): number {
+	const subtotal = calculateSubtotal(items);
+	const discountRate = getDiscountRate(customerType);
+	const discount = subtotal * discountRate;
+	return subtotal - discount;
+}
+
+function formatMoney(cents: number): string {
+	return `R$ ${(cents / 100).toFixed(2)}`;
+}
+
+export function printReceipt(items: CartItem[], customerType: CustomerType): void {
+	const subtotal = calculateSubtotal(items);
+	const discountRate = getDiscountRate(customerType);
+	const discount = subtotal * discountRate;
+	const total = subtotal - discount;
+
+	console.log("Subtotal: " + formatMoney(subtotal));
+	console.log("Desconto: " + formatMoney(discount));
+	console.log("Total:    " + formatMoney(total));
+}
+
+const cart: CartItem[] = [
+	{ name: "Camiseta", unitPriceInCents: 7990, quantity: 2 },
+	{ name: "Tênis", unitPriceInCents: 24990, quantity: 1 },
 ];
 
-calc(carrinho, 1, true);
+const total = calculateCartTotal(cart, CustomerType.Silver);
+printReceipt(cart, CustomerType.Silver);
+console.log("Total em centavos:", total);

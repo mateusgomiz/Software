@@ -1,30 +1,19 @@
-// =============================================================================
-// BLOCO 2 — Comentários sob suspeita e formatação automatizada (REFATORADO)
-// =============================================================================
-// Aplicado:
-//   - Comentários redundantes, banners e marcas de autoria removidos.
-//   - Nomes melhores no lugar de comentários explicativos (nm → nome, idd → idade).
-//   - Constante para o número mágico 18.
-//   - Formatação consistente — basta rodar Prettier/Biome.
-// =============================================================================
+//TypeScript
 
-const IDADE_MINIMA_MAIOR_DE_IDADE = 18;
+export class User {
+    constructor(
+        public readonly id: string,
+        public readonly name: string,
+        public readonly age: number
+    ) {}
 
-export class Usuario {
-	constructor(
-		public readonly id: string,
-		public readonly nome: string,
-		public readonly idade: number,
-	) {}
-
-	public ehMaiorDeIdade(): boolean {
-		return this.idade >= IDADE_MINIMA_MAIOR_DE_IDADE;
-	}
+    public isAdult(): boolean {
+        return this.age >= 18;
+    }
 }
 
-export function somar(a: number, b: number): number {
-	return a + b;
-}
+export const add = (a: number, b: number): number => a + b;
 
-console.log(new Usuario("u1", "Ana", 20).ehMaiorDeIdade());
-console.log(somar(2, 3));
+// Testes no console
+console.log(new User("u1", "Mateus", 25).isAdult()); // true
+console.log(add(2, 3)); // 5
